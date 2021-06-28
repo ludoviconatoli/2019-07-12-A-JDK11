@@ -5,8 +5,11 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Adiacenza;
+import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +44,7 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -49,13 +52,53 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	
+    	int np;
+    	try {
+    		np = Integer.parseInt(this.txtPorzioni.getText());
+    	}catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Prima indica un numero di porzioni intero");
+    		return;
+    	}
+    	
+    	model.creaGrafo(np);
+    	this.txtResult.appendText("GRAFO CREATO\n\n");
+    	this.txtResult.appendText("#vertici: " + model.getNVertici() + "\n");
+    	this.txtResult.appendText("#archi: " + model.getNArchi());
+    	
+    	this.boxFood.getItems().addAll(model.getVertici());
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...");
+    	
+    	int np;
+    	try {
+    		np = Integer.parseInt(this.txtPorzioni.getText());
+    	}catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Prima indica un numero di porzioni intero e crea il grafo");
+    		return;
+    	}
+    	
+    	Food f = this.boxFood.getValue();
+    	if(f == null) {
+    		this.txtResult.setText("Prima selezionare un cibo da cui partire");
+    		return;
+    	}
+    	
+    	List<Adiacenza> res = model.getCalorie(f);
+    	if(!res.isEmpty()) {
+    		this.txtResult.appendText("I cibi con più calorie congiunte a " + f + " sono: \n\n");
+        	for(int i=0; i< 5; i++) {
+        		
+        		this.txtResult.appendText(res.get(i) +"\n");
+        	}
+    	}else {
+    		this.txtResult.appendText("Non ci sono vertci congiunti");
+    	}
+    	
+    	
     }
 
     @FXML
