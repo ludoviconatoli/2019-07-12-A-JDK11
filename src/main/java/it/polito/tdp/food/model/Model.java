@@ -84,77 +84,29 @@ public class Model {
 		return grafo;
 	}
 	
-	private int k;
-	private Food partenza;
+	public String simula(Food cibo, int K) {
+		Simulator sim = new Simulator(this.grafo, this) ;
+		sim.setK(K);
+		sim.init(cibo);
+		sim.run();
+		String messaggio = String.format("Preparati %d cibi in %f minuti\n", 
+				sim.getCibiPreparati(), sim.getTempoPreparazione());
+		return messaggio ;
+	}
 	
-	private double minuti;
-	private int numStazioniOccupate;
-	private List<Food> cibiInPreparazione;
-	
-	private int cibiPreparati;
-	private double tempoTotale;
-	private PriorityQueue<Event> queue;
-	
-	public void init(int k, Food start) {
-		this.k = k;
-		this.partenza = start;
+	public List<FoodCalories> elencoCibiConnessi(Food f) {
 		
-		this.cibiPreparati = 0;
-		this.tempoTotale = 0.0;
-		queue = new PriorityQueue<>();
-		numStazioniOccupate = 0;
+		List<FoodCalories> result = new ArrayList<>() ;
 		
-		List<Adiacenza> cibi = this.getCalorie(partenza);
-		if(!cibi.isEmpty()) {
-			for(int i=0; i< k && i<cibi.size(); i++){
-				if(cibi.get(i) != null) {
-					queue.add(new Event(cibi.get(i).getF2(), cibi.get(i).getPeso()));
-					numStazioniOccupate++;
-					cibiInPreparazione.add(cibi.get(i).getF2());
-				}
-				
-			}
-		}else {
-			return;
+		List<Food> vicini = Graphs.neighborListOf(this.grafo, f) ;
+		
+		for(Food v: vicini) {
+			Double calorie = this.grafo.getEdgeWeight(this.grafo.getEdge(f, v)) ;
+			result.add(new FoodCalories(v, calorie)) ;
 		}
-	}
-	
-	public void run() {
 		
-		while(!this.queue.isEmpty()) {
-			Event e = this.queue.poll();
-			
-			tempoTotale += e.getMinuti();
-			cibiPreparati++;
-			
-			List<Adiacenza> successivi = this.getCalorie(e.getFood());
-			
-			if(!successivi.isEmpty()) {
-				int i=0;
-				while(i < successivi.size()){
-					
-					if(!cibiInPreparazione.contains(successivi.get(i))) {
-						queue.add(new Event(successivi.get(i).getF2(), successivi.get(i).getPeso()));
-						break;
-					}
-					i++;
-				}
-				
-				if(i == successivi.size()) {
-					numStazioniOccupate--;
-				}
-			}else {
-				numStazioniOccupate--;
-			}
-			
-		}
-	}
-	
-	public int getNumeroCibiPreparati() {
-		return this.cibiPreparati;
-	}
-	
-	public double getTempoTotale() {
-		return this.tempoTotale;
+		Collections.sort(result);
+		
+		return result ;
 	}
 }

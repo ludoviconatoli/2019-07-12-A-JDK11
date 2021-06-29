@@ -2,32 +2,47 @@ package it.polito.tdp.food.model;
 
 import java.time.LocalTime;
 
-public class Event {
+public class Event implements Comparable<Event>{
 
-	private Food food;
-	private double minuti;
-	
-	public Event(Food food, double minuti) {
-		super();
-		this.food = food;
-		this.minuti = minuti;
+	public enum EventType {
+		INIZIO_PREPARAZIONE, // viene assegnato un cibo ad una stazione
+		FINE_PREPARAZIONE, // la stazione ha completato la prep. di un cibo
 	}
 
+	private Double time ; // tempo in minuti
+	private EventType type ;
+	private Stazione stazione ;
+	private Food food ;
+	
+	public Double getTime() {
+		return time;
+	}
+	public Stazione getStazione() {
+		return stazione;
+	}
 	public Food getFood() {
 		return food;
 	}
-
-	public void setFood(Food food) {
+	/**
+	 * @param time
+	 * @param stazione
+	 * @param food
+	 */
+	public Event(Double time, EventType type, Stazione stazione, Food food) {
+		super();
+		this.time = time;
+		this.type = type;
+		this.stazione = stazione;
 		this.food = food;
 	}
-
-	public double getMinuti() {
-		return minuti;
+	@Override
+	public int compareTo(Event other) {
+		return this.time.compareTo(other.time);
 	}
-
-	public void setMinuti(double minuti) {
-		this.minuti = minuti;
+	public EventType getType() {
+		return type;
 	}
+	
 	
 	
 		
