@@ -104,7 +104,35 @@ public class FoodController {
     @FXML
     void doSimula(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Simulazione...");
+    	
+    	int np;
+    	try {
+    		np = Integer.parseInt(this.txtPorzioni.getText());
+    	}catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Prima indica un numero di porzioni intero e crea il grafo");
+    		return;
+    	}
+    	
+    	Food f = this.boxFood.getValue();
+    	if(f == null) {
+    		this.txtResult.setText("Prima selezionare un cibo da cui partire");
+    		return;
+    	}
+    	
+    	int k;
+    	try {
+    		k = Integer.parseInt(this.txtK.getText());
+    	}catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Prima indica un numero K intero");
+    		return;
+    	}
+    	
+    	model.init(k, f);
+    	model.run();
+    	
+    	this.txtResult.appendText("Il risultato della simulazione: \n\n");
+    	this.txtResult.appendText("Tempo totale: " + String.format("%.2f", model.getTempoTotale()) + " minuti\n");
+    	this.txtResult.appendText("Cibi preparati: " + model.getNumeroCibiPreparati());
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
